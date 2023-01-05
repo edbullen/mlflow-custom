@@ -20,7 +20,7 @@ class HybridFunction(mlflow.pyfunc.PythonModel):
     def _custom_function(self, model_input :pd.DataFrame):
         """ Hybrid function combines two different functions depending on the value of x
             x < x0 -> y is a constant value y0
-            x >= x0 -> y is uniform gradient function,  y = gradient*x + y0 (y0 is the intercept)
+            x >= x0 -> y is uniform gradient function,  y = gradient*x + c (c is the intercept)
 
         Args:
            model_input: :pandas.DataFrame:
