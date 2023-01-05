@@ -19,7 +19,7 @@ import mlflow
 registered_model = "models:/custom_model/Production"
 
 # Code copied from the MLflow Artifact sample code
-loaded_model = mlflow.pyfunc.load_model(registered_model)
+loaded_model = mlflow.pyfunc.load_model(registered_model, suppress_warnings=True)
 
 
 # COMMAND ----------
@@ -40,4 +40,52 @@ loaded_model.predict(data)
 
 # COMMAND ----------
 
+# MAGIC %md 
+# MAGIC ## Simulate using model for batch-scoring against Delta-Lake data
 
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Pyspark DF Example
+
+# COMMAND ----------
+
+pyspark_df = spark.read.option("inferSchema", True)\
+    .option("header", True)\
+    .option("delimiter", ";")\
+    .csv("/databricks-datasets/wine-quality/winequality-red.csv")
+
+# COMMAND ----------
+
+display(pyspark_df.head(5))
+
+# COMMAND ----------
+
+custom_model_udf = mlflow.pyfunc.spark_udf(spark, "models:/custom_model/Production")
+
+# COMMAND ----------
+
+from pyspark.sql import functions as F
+pyspark_df.withColumn('prediction', 
+                      F.round(custom_model_udf(F.col("fixed acidity")),2))\
+           .select("fixed acidity", "prediction").show(100, False)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### SQL Query Example
+
+# COMMAND ----------
+
+pyspark_df.createOrReplaceTempView("wine_data_tmp")
+
+# COMMAND ----------
+
+# register the model as a sql function that can be accessed in SQL
+spark.udf.register("custom_model_udf", custom_model_udf)
+
+# COMMAND ----------
+
+# MAGIC %sql 
+# MAGIC SELECT `fixed acidity`, custom_model_udf(`fixed acidity`) as prediction
+# MAGIC FROM wine_data_tmp;
