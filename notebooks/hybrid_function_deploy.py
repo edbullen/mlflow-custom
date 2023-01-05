@@ -41,13 +41,9 @@ response = mlflow.pyfunc.log_model("custom_model", python_model=model)
 
 # COMMAND ----------
 
-from mlflow.models.signature import infer_signature
 
 # Set any tags we want in the Run to help identify it
 mlflow.set_tag("project", "hybrid_model")
-
-# This logs the model as a Run in the Experiment
-mlflow.sklearn.log_model(model, "hybrid_model")
 
 # Set some metrics that provide information about the run - i.e. the parameters associated with the model-instance
 mlflow.log_metric('x0', 5)
@@ -103,4 +99,8 @@ print(f"Model Version Number: \t {registry_response.version}")
 # COMMAND ----------
 
 client.transition_model_version_stage("custom_model", registry_response.version, stage = "Production", archive_existing_versions=True)
+
+
+# COMMAND ----------
+
 
