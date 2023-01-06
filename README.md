@@ -32,9 +32,7 @@ Two Databricks notebooks are provided in this Repo, demonstrating how the custom
 
 The second notebook shows how a model can be loaded:
 ```python
-registered_model = "models:/custom_model/Production"
-
-loaded_model = mlflow.pyfunc.load_model(registered_model)
+loaded_model = mlflow.pyfunc.load_model("models:/custom_model/Production")
 ```
 then used to generate predictions (custom function results) against a Pandas dataframe:
 ```python
@@ -53,7 +51,7 @@ FROM data_table;
 
 ## Code
 
-The class definition for loading the model code into MLflow is in `./functions/HybridFunction.py`.  
+The class definition for loading the model code into MLflow is in `functions/HybridFunction.py`.  
 
 This is a standard Python function written to follow the [mlflow.pyfunc.PythonModel](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel) specification with the following structure:
 
@@ -79,7 +77,7 @@ class HybridFunction(mlflow.pyfunc.PythonModel):
         return model_input.apply(self._custom_function)
 ```
 
-Tests for the custom function code are in `./tests/test_function.py`.  
+Tests for the custom function code are in `tests/test_function.py`.  
 
 The tests demonstrate how the function works and also illustrate how the model code can be developed and tested independently of any MLflow or Databricks environment (no notebooks required).  The Git integration in the Databricks notebook environment make it easy to manage the deployment lifecycyle and bring tested versions of the  code into the MLflow deployment lifecycle.
 
@@ -87,7 +85,7 @@ The tests demonstrate how the function works and also illustrate how the model c
 
 ## Example Hybrid Function
 
-A hypothetical model-function is used to illustrate the use-case.
+A hypothetical model-function is provided to illustrate the use-case.
 
 a Hybrid Function or [Piecewise Function](https://en.wikipedia.org/wiki/Piecewise) is implemented that combines two different functions depending on the value of x (the domain).  
 
@@ -97,9 +95,10 @@ a Hybrid Function or [Piecewise Function](https://en.wikipedia.org/wiki/Piecewis
 ![hybrid function](./doc/HybridFunction.png "Hybrid Function")
 
 
-This simple concept can be extended to encompass complex business rules or "models" that are not catered for by the usual machine learning frameworks.  
+This simple concept can be extended to encompass complex business rules or models that are not catered for by the usual machine learning frameworks.  
   
-The intention is to show how bespoke business logic can be coded independently in Python and then packaged and deployed for use against business data in the MLflow framwork.
+The intention is to show how bespoke business logic can be coded independently in Python and then packaged and deployed for use against business data in the MLflow framework.
 
+The Databricks notebooks in this Repo show using this model applied to the [wine data-set](https://archive.ics.uci.edu/ml/datasets/wine).   It doesn't serve any useful purpose other than demonstrate applying a custom function against a data-set.
 
 
