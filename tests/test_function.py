@@ -1,6 +1,6 @@
 import pandas as pd
 
-from functions.HybridFunction import HybridFunction
+from hybridfunction.hybridfunction import HybridFunction
 
 
 def test_custom_function():
@@ -15,10 +15,6 @@ def test_custom_function():
 
     # apply the model's _custom_function to get output in a Pandas series
     model_output = data.apply(model._custom_function, axis=1)
-
-    # print(int(data[0]))
-    # print(int(data[7]))
-    # print(int(data[14]))
 
     assert int(model_output[0]) == 2
     assert int(model_output[7]) == 2

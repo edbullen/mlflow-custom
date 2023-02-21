@@ -51,7 +51,7 @@ FROM data_table;
 
 ## Code
 
-The class definition for loading the model code into MLflow is in `functions/HybridFunction.py`.  
+The class definition for loading the model code into MLflow is in `hybridfunction/hybridfunction.py`.  
 
 This is a standard Python function written to follow the [mlflow.pyfunc.PythonModel](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel) specification with the following structure:
 
@@ -100,5 +100,50 @@ This simple concept can be extended to encompass complex business rules or model
 The intention is to show how bespoke business logic can be coded independently in Python and then packaged and deployed for use against business data in the MLflow framework.
 
 The Databricks notebooks in this Repo show using this model applied to the [wine data-set](https://archive.ics.uci.edu/ml/datasets/wine).   It doesn't serve any useful purpose other than demonstrate applying a custom function against a data-set.
+
+
+## Build and Deploy Wheel for MLFlow Serving
+
+Ref docs:
+
+
+https://docs.databricks.com/machine-learning/model-inference/serverless/private-libraries-serverless-model-serving.html
+
+https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model
+
+### Part 1 - build wheel and upload to Cluster
+
++ pip install --upgrade pip
++ Configure `setup.py`  
++ build wheel: `python setup.py sdist bdist_wheel`  
++ Upload this wheel (`./dist/hybridfunction-1.0.1-py3-none-any.whl`) to the Databricks Cluster  
++ Install the wheel in the cluster AND note (copy) the DBFS path to the wheel - this is noted on the Cluster Libraries admin page
+
+
+**Initialise Class**:  
+```python
+model = HybridFunction.HybridFunction(x0=5, y0=2, gradient=1)
+```
+
+### Part 2 - get the wheel path and link it to MLflow
+
+From the Cluster librares admin page, note the DBFS path to the installed wheel for `hybridfunction`
+EG:
+```
+dbfs:/FileStore/jars/9c8d55d6_8aa5_41ad_984d_f615bae87535/hybridfunction-1.0-py3-none-any.whl
+```
+Change this path to use a `/` instead of a `:` for the DBFS itentifier:
+```
+/dbfs/FileStore/jars/9c8d55d6_8aa5_41ad_984d_f615bae87535/hybridfunction-1.0-py3-none-any.whl
+```
+Use this to log the dependencies when adding the model to the MLflow repository using `mlflow.log`
+
+```python
+response = mlflow.pyfunc.log_model("hybridfunction",
+                                    python_model= model,
+                                    pip_requirements=["/dbfs/FileStore/jars/03855ebe_a9bc_470f_83c9_6c6ed7fc6289/hybridfunction-1.0.1-py3-none-any.whl"]
+                              )
+```
+
 
 
