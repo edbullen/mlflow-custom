@@ -16,7 +16,7 @@
 import mlflow
 
 # Instead of specifying the model version or run-id, make this code generic to pick up whatever model has been promoted to Production
-registered_model = "models:/custom_model/Production"
+registered_model = "models:/hybridfunction/Production"
 
 # Code copied from the MLflow Artifact sample code
 loaded_model = mlflow.pyfunc.load_model(registered_model, suppress_warnings=True)
@@ -61,7 +61,7 @@ display(pyspark_df.head(5))
 
 # COMMAND ----------
 
-custom_model_udf = mlflow.pyfunc.spark_udf(spark, "models:/custom_model/Production")
+custom_model_udf = mlflow.pyfunc.spark_udf(spark, "models:/hybridfunction/Production")
 
 # COMMAND ----------
 

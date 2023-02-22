@@ -16,7 +16,7 @@ import pandas as pd
 # COMMAND ----------
 
 # import from ./hybridfunction.hybridfunction.py - reference from the root of this Repo
-from hybridfunction.hybridfunction import HybridFunction
+from hybridfunction import HybridFunction
 
 # COMMAND ----------
 
@@ -36,6 +36,8 @@ model = HybridFunction(x0=5, y0=2, gradient=1)
 # MAGIC If we want to server the custom model from the MLFlow Rest API, we need to package the code as a Python Wheel and upload this to the cluster. This is done by specifying a path to the Python whell using `pip_arguments` when the model is logged to the MLflow tracking server.
 # MAGIC 
 # MAGIC `pip_arguments` needs the *path of where the wheel file gets stored on the cluster*.  The path listed by the Databricks cluster web UI needs to be adjusted to remove the `:` separating dbfs and the rest of the path.  
+# MAGIC 
+# MAGIC If not using MLflow serving, just delete the pip requirements part.
 
 # COMMAND ----------
 
@@ -43,7 +45,7 @@ model = HybridFunction(x0=5, y0=2, gradient=1)
 mlflow.set_experiment(experiment_name = "/Users/ed.bullen@databricks.com/hybrid_function_deploy")
 response = mlflow.pyfunc.log_model("hybridfunction",
                                     python_model=model,
-                                    pip_requirements=["/dbfs/FileStore/jars/03855ebe_a9bc_470f_83c9_6c6ed7fc6289/hybridfunction-1.0.1-py3-none-any.whl"]
+                                    pip_requirements=["dbfs:/FileStore/jars/eb712495_199c_47fc_98d2_0f666aebf7f6/hybridfunction-1.0.3-py3-none-any.whl"]
                               )
 
 # COMMAND ----------
@@ -54,7 +56,7 @@ response = mlflow.pyfunc.log_model("hybridfunction",
 # COMMAND ----------
 
 # Set any tags we want in the Run to help identify it
-mlflow.set_tag("project", "custom_model")
+mlflow.set_tag("project", "hybridfunction")
 
 # Set some metrics that provide information about the run - i.e. the parameters associated with the model-instance
 mlflow.log_metric('x0', 5)
@@ -83,7 +85,7 @@ print(f"Model URI: \t {response.model_uri}")
 # COMMAND ----------
 
 # register model - after this will appear in the Databricks UI "Models" view
-registry_response = mlflow.register_model(response.model_uri, "custom_model")
+registry_response = mlflow.register_model(response.model_uri, "hybridfunction")
 
 # COMMAND ----------
 
@@ -109,7 +111,7 @@ print(f"Model Version Number: \t {registry_response.version}")
 
 # COMMAND ----------
 
-client.transition_model_version_stage("custom_model", registry_response.version, stage = "Production", archive_existing_versions=True)
+client.transition_model_version_stage("hybridfunction", registry_response.version, stage = "Production", archive_existing_versions=True)
 
 
 # COMMAND ----------
