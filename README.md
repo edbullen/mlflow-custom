@@ -122,21 +122,21 @@ https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.l
 
 **Initialise Class**:  
 ```python
-model = HybridFunction.HybridFunction(x0=5, y0=2, gradient=1)
+model = HybridFunction(x0=5, y0=2, gradient=1)
 ```
 
 ### Part 2 - get the wheel path and link it to MLflow
 
-From the Cluster librares admin page, note the DBFS path to the installed wheel for `hybridfunction`
-EG:
+From the Cluster libraries admin page, note the DBFS path to the installed wheel for `hybridfunction`
+EG:  
 ```
 dbfs:/FileStore/jars/9c8d55d6_8aa5_41ad_984d_f615bae87535/hybridfunction-1.0-py3-none-any.whl
 ```
-Change this path to use a `/` instead of a `:` for the DBFS itentifier:
+Change this path to use a `/` instead of a `:` for the DBFS itentifier- EG:
 ```
 /dbfs/FileStore/jars/9c8d55d6_8aa5_41ad_984d_f615bae87535/hybridfunction-1.0-py3-none-any.whl
 ```
-Use this to log the dependencies when adding the model to the MLflow repository using `mlflow.log`
+Use this to log the dependencies when adding the model to the MLflow repository using `mlflow.log` - EG:  
 
 ```python
 response = mlflow.pyfunc.log_model("hybridfunction",
