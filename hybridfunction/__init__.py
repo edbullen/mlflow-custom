@@ -1,1 +1,1 @@
-from .hybridfunction import *
+from hybridfunction.hybridfunction import HybridFunction

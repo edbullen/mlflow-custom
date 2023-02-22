@@ -12,7 +12,8 @@ setup(
     name='hybridfunction',
     install_requires=INSTALL_REQUIRES,
     #package_dir = {'': 'hybridfunction'},
-    packages=find_packages(include=["hybridfunction"]),
-    version='1.0.1',
+    #packages=find_packages(include=["hybridfunction"]),
+    packages=["hybridfunction"],
+    version='1.0.3',
     author='Edward Bullen',
 )

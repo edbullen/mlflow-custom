@@ -7,7 +7,8 @@ Example - call MLflow Serving API to score data payload against model served out
 
 """
 
-MLFLOW_URL = 'https://7177936340822399.9.gcp.databricks.com/model/hybridfunction/Production/invocations'
+# replace this URL with the URL of the MLflow model serving endpoint.
+MLFLOW_URL = 'https://7177936340822399.9.gcp.databricks.com/model/hybridmodel/Production/invocations'
 
 
 def get_token():

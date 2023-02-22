@@ -1,6 +1,7 @@
 import mlflow
 import pandas as pd
 
+__all__ = ["HybridFunction"]
 
 class HybridFunction(mlflow.pyfunc.PythonModel):
     """ This Class wraps a custom function in MLflow, so that it can be parameterised, tracked and deployed with MLflow
