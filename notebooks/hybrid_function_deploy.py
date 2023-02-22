@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Deploy Custom Function to MLflow
+# MAGIC # Deploy Custom Model to MLflow
 # MAGIC Notebook to deploy an instance of the `HybridFunction` class in MLflow with function attributes set to parameterise the custom function.
 
 # COMMAND ----------
@@ -15,8 +15,8 @@ import pandas as pd
 
 # COMMAND ----------
 
-# import from ./functions/HybridFunction.py - reference from the root of this Repo
-from functions.HybridFunction import HybridFunction
+# import from ./hybridfunction.hybridfunction.py - reference from the root of this Repo
+from hybridfunction.hybridfunction import HybridFunction
 
 # COMMAND ----------
 
@@ -30,9 +30,21 @@ model = HybridFunction(x0=5, y0=2, gradient=1)
 
 # COMMAND ----------
 
-# log the model as an MLflow experiment
-mlflow.set_experiment("/Users/ed.bullen@databricks.com/hybrid_model")
-response = mlflow.pyfunc.log_model("custom_model", python_model=model)
+# MAGIC %md
+# MAGIC ### MLFlow REST API Model Serving
+# MAGIC 
+# MAGIC If we want to server the custom model from the MLFlow Rest API, we need to package the code as a Python Wheel and upload this to the cluster. This is done by specifying a path to the Python whell using `pip_arguments` when the model is logged to the MLflow tracking server.
+# MAGIC 
+# MAGIC `pip_arguments` needs the *path of where the wheel file gets stored on the cluster*.  The path listed by the Databricks cluster web UI needs to be adjusted to remove the `:` separating dbfs and the rest of the path.  
+
+# COMMAND ----------
+
+# log the model as an MLflow experiment - use name matching the notebook name
+mlflow.set_experiment(experiment_name = "/Users/ed.bullen@databricks.com/hybrid_function_deploy")
+response = mlflow.pyfunc.log_model("hybridfunction",
+                                    python_model=model,
+                                    pip_requirements=["/dbfs/FileStore/jars/03855ebe_a9bc_470f_83c9_6c6ed7fc6289/hybridfunction-1.0.1-py3-none-any.whl"]
+                              )
 
 # COMMAND ----------
 
@@ -41,9 +53,8 @@ response = mlflow.pyfunc.log_model("custom_model", python_model=model)
 
 # COMMAND ----------
 
-
 # Set any tags we want in the Run to help identify it
-mlflow.set_tag("project", "hybrid_model")
+mlflow.set_tag("project", "custom_model")
 
 # Set some metrics that provide information about the run - i.e. the parameters associated with the model-instance
 mlflow.log_metric('x0', 5)
@@ -103,4 +114,7 @@ client.transition_model_version_stage("custom_model", registry_response.version,
 
 # COMMAND ----------
 
-
+# MAGIC %md
+# MAGIC # Start Model Serving API
+# MAGIC 
+# MAGIC this Should load the Python Wheel that was logged - then the REST API will front the custom model
